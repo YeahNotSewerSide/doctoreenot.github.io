@@ -37,7 +37,7 @@ function main() {
     var main_bg = document.getElementById('main_bg');
 
     var stage = 0; // 0 - main menu
-                // 1 - set username/pfp
+                    // 1 - set username/pfp
     initialize();
     
 
