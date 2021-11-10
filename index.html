@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <style>
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+                border: 0;
+                overflow: hidden; /*  Disable scrollbars */
+                display: block;  /* No floating content on sides */
+                }
+            .menu_buttons_group{ 
+                position:absolute; 
+                top:0; 
+                left:0;
+                z-index:2;              
+            }
+            .menu_button{
+                
+                background-color:transparent;
+                color:white; 
+                font-size: 3em; 
+                width:100%;              
+            }
+            .menu_button:not(:first-child){              
+                border-top: none;
+            }
+            
+
+        </style>
+    <script src="scripts/main.js"></script>
+
+    <!--Standart assets-->
+    <img id="main_bg" src="assets/main_background.jpg" 
+                    width="1920" height="1080">
+    </head>
+
+    <body onload="main()">
+        
+        <!--Main canvas-->
+        <canvas id='game_window' style='position:absolute; left:0px; top:0px; z-index:1;'>
+        </canvas>
+
+        <!--menu buttons-->
+        <div id="main_menu_button_group" class="menu_buttons_group">
+            <button id="online_button" class="menu_button">ИГРА ОНЛАЙН</button>
+            <button id="button" class="menu_button">Да хз, шо тут</button>
+        </div>
+
+    </body>
+
+</html>
