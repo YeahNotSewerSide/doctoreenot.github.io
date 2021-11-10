@@ -5,7 +5,7 @@ function main() {
     const BUTTONS_IN_MAIN_MENU_HEIGHT = temp.height;
     const BUTTONS_IN_MAIN_MENU_WIDTH = temp.width;
 
-    const REDRAW_TIMEOUT = 500;
+    const REDRAW_TIMEOUT = 50;
 
     var
     // Obtain a reference to the canvas element using its id.
