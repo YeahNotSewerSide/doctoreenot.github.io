@@ -29,6 +29,7 @@ function main() {
     var LMB_LOGIN = document.getElementById("login");
     var LMB_SET_PFP = document.getElementById("set_pfp");
     var LMB_BACK = document.getElementById("back");
+    var LMB_USERNAME = document.getElementById("username");
     var LMB_BUTTONS = document.getElementById("login_button_group");
 
     var last_resize = 0;
@@ -114,12 +115,14 @@ function main() {
             LMB_LOGIN.removeAttribute("disabled");
             LMB_SET_PFP.removeAttribute("disabled");
             LMB_BACK.removeAttribute("disabled");
+            LMB_USERNAME.removeAttribute("disabled");
             LMB_BUTTONS.removeAttribute("style");
         }
         function disable_login_menu(){
             LMB_LOGIN.setAttribute("disabled","1");
             LMB_SET_PFP.setAttribute("disabled","1");
             LMB_BACK.setAttribute("disabled","1");
+            LMB_USERNAME.setAttribute("disabled","1");
             LMB_BUTTONS.setAttribute("style","z-index:0;display:none;");
         }
 

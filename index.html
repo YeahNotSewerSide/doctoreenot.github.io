@@ -13,7 +13,8 @@
                 position:absolute; 
                 top:0; 
                 left:0;
-                z-index:2;              
+                z-index:2;  
+                max-width: 40em;            
             }
             .menu_button{
                 background-color:transparent;
@@ -27,6 +28,14 @@
             }
             .menu_button:hover{
                 background-color:rgb(50, 50, 241) ;
+            }
+
+            .menu_input{
+                background-color:transparent;
+                color:white; 
+                font-size: 3em; 
+                width:100%; 
+                border-color: rgb(55, 230, 230);             
             }
 
         </style>
@@ -51,6 +60,7 @@
 
         <!--login menu buttons-->
         <div id="login_button_group" class="menu_buttons_group">
+            <input id="username" type="text" class="menu_input">
             <button id="login" class="menu_button">Войти</button>
             <button id="set_pfp" class="menu_button">Выбрать аватар</button>
             <button id="back" class="menu_button">Назад</button>
