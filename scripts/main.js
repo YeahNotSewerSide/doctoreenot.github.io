@@ -5,7 +5,7 @@ function main() {
     const BUTTONS_IN_MAIN_MENU_HEIGHT = temp.height;
     const BUTTONS_IN_MAIN_MENU_WIDTH = temp.width;
 
-    const REDRAW_TIMEOUT = 50;
+    const REDRAW_TIMEOUT = 30;
 
     var
     // Obtain a reference to the canvas element using its id.
@@ -26,7 +26,7 @@ function main() {
     function initialize() {
         // Register an event listener to call the resizeCanvas() function 
         // each time the window is resized.
-        window.addEventListener('resize', resizeCanvas_wrapped, false);
+        window.addEventListener('resize', resizeCanvas, false);
         // Draw canvas border for the first time.
         resizeCanvas_wrapped();
         }
@@ -43,7 +43,7 @@ function main() {
         }
 
         function resizeCanvas_wrapped(){
-            //last_resize = new Date();
+            last_resize = new Date();
             game_window.width = window.innerWidth;
             game_window.height = window.innerHeight;
 
@@ -52,7 +52,7 @@ function main() {
                     redraw_main_menu();
                     break;
             }
-            //in_resize = false;
+            in_resize = false;
         }
         // Runs each time the DOM window resize event fires.
         // Resets the canvas dimensions to match window,
