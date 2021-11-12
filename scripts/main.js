@@ -1,4 +1,8 @@
+
+
+
 function main() {
+
 
     const BUTTONS_IN_MAIN_MENU = document.getElementById('main_menu_button_group');
     var temp = BUTTONS_IN_MAIN_MENU.getBoundingClientRect();
@@ -10,6 +14,14 @@ function main() {
     const BUTTONS_IN_LOGIN_MENU_HEIGHT = temp.height;
     const BUTTONS_IN_LOGIN_MENU_WIDTH = temp.width;
 
+    var array = new Uint8Array(4);
+    
+    array[0] = 0;
+    array[1] = 0;
+    array[2] = 0;
+    array[3] = 0;
+    
+    console.log(sha1_digest(array));
 
     const REDRAW_TIMEOUT = 30;
 

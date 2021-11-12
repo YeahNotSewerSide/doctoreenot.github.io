@@ -39,6 +39,9 @@
             }
 
         </style>
+    
+    <base href=".">
+    <script type="module" src="scripts/sha1WASM.js"></script>
     <script src="scripts/main.js"></script>
 
     <!--Standart assets-->
@@ -52,13 +55,13 @@
         <canvas id='game_window' style='position:absolute; left:0px; top:0px; z-index:1;'>
         </canvas>
 
-        <!--main menu buttons-->
+        <!--main menu-->
         <div id="main_menu_button_group" class="menu_buttons_group">
             <button id="online_button" class="menu_button">ИГРА ОНЛАЙН</button>
             <button id="options" class="menu_button">Настройки</button>
         </div>
 
-        <!--login menu buttons-->
+        <!--login menu-->
         <div id="login_button_group" class="menu_buttons_group">
             <input id="username" type="text" class="menu_input" placeholder="Никнейм">
             <button id="login" class="menu_button">Войти</button>
@@ -66,6 +69,7 @@
             <button id="back" class="menu_button">Назад</button>
         </div>
 
+        
     </body>
 
 </html>
