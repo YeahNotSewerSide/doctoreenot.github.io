@@ -21,7 +21,7 @@
                 color:white; 
                 font-size: 3em; 
                 width:100%; 
-                border-color: rgb(55, 230, 230);             
+                border-color: rgb(55, 230, 230);           
             }
             .menu_button:not(:first-child){              
                 border-top: none;
@@ -37,10 +37,27 @@
                 width:100%; 
                 border-color: rgb(55, 230, 230);             
             }
+            .menu_input:not(:first-child){
+                border-top: none;
+            }
+
+            .menu_dragndrop{
+                background-color:transparent;
+                color:white; 
+                font-size: 3em; 
+                width:100%; 
+                
+                border-width:1px;
+                border-style:solid;
+                border-color: rgb(55, 230, 230);             
+            }
+            .menu_dragndrop:not(:first-child){
+                border-top: none;
+            }
 
         </style>
     
-    
+    <script src="scripts/sha1WASM_bg.js"></script>
     <script src="scripts/main.js"></script>
 
     <!--Standart assets-->
@@ -65,10 +82,24 @@
             <input id="username" type="text" class="menu_input" placeholder="Никнейм">
             <button id="login" class="menu_button">Войти</button>
             <button id="set_pfp" class="menu_button">Выбрать аватар</button>
-            <button id="back" class="menu_button">Назад</button>
+            <button id="back_login" class="menu_button">Назад</button>
         </div>
 
+        <!--set pfp menu-->
+        <div id="set_pfp_group" class="menu_buttons_group">
+            <div id="pfp_d&d" class="menu_dragndrop">
+                Перетащи сюда фото...
+            </div>
+            <button id="back_pfp" class="menu_button">Назад</button>
+        </div>
         
+        <!--waiting menu-->
+        <div id="wait", class="menu_buttons_group">
+            <div id="wait_notice" class="menu_dragndrop">
+                
+            </div>
+        </div>
+
     </body>
 
 </html>
