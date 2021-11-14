@@ -1,4 +1,5 @@
 
+//https://github.com/Rob--W/cors-anywhere
 
 
 function main() {
@@ -437,7 +438,7 @@ function main() {
                     "body":data,
                     "headers":{"Content-MD5":pfp_hash}
                 })
-                pfp_url = await response.text;
+                pfp_url = await response.text();
                 console.log(pfp_url);
             }else{
                 console.log("no image is set");
