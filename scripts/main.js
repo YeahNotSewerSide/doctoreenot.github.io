@@ -74,6 +74,10 @@ function main() {
     var WAITING_MENU_WIDTH = temp.width;
     const WAIT_NOTICE = document.getElementById("wait_notice");
 
+    // Inspector menu
+    const INSPECTOR_MENU = document.getElementById("inspector");
+    
+
 
     var last_resize = 0;
     var in_resize = false;
@@ -90,6 +94,15 @@ function main() {
     var USERNAME = 0;
     var TOKEN = 0;
     var SERVER_URL = 0;
+    var WEBSOCKET = 0;
+    var WEBSOCKET_CONNECTION_ID = 0;
+    var WEBSOCKET_CONNECTION_TOKEN = 0;
+
+    // LIVE SERVER INFO
+    var USERS = new Map;
+    var GAMES = new Map();
+    var INITIAL_AIS = []
+
 
     var stage = 0; // 0 - main menu
                     // 1 - set username/pfp
@@ -102,6 +115,7 @@ function main() {
         disable_login_menu();
         disable_pfp_set_menu();
         disable_waiting_menu();
+        //disable_inspector_menu();
 
         // registering events
         window.addEventListener('resize', resizeCanvas, false);
@@ -163,8 +177,8 @@ function main() {
 
         function resizeCanvas_wrapped(){
             last_resize = new Date();
-            game_window.width = window.innerWidth;
-            game_window.height = window.innerHeight;
+            game_window.width = document.body.clientWidth;
+            game_window.height = document.body.clientHeight;
 
             switch(stage){
                 case 0:
@@ -232,6 +246,7 @@ function main() {
             DRAGNDROP_ZONE_IN_SET_PFP_MENU.setAttribute("style","z-index:0;display:none;");
         }
 
+
         function enable_waiting_menu(wait_notice){
             WAIT_NOTICE.innerText = wait_notice;
             WAITING_MENU.removeAttribute('style');
@@ -242,6 +257,14 @@ function main() {
         }
         function disable_waiting_menu(){
             WAITING_MENU.setAttribute('style',"z-index:0;display:none;");
+        }
+
+
+        function enable_inspector_menu(){
+            INSPECTOR_MENU.removeAttribute('style');
+        }
+        function disable_inspector_menu(){
+            INSPECTOR_MENU.setAttribute('style',"z-index:0;display:none;");
         }
 
         // HANDLERS
@@ -443,9 +466,99 @@ function main() {
             }else{
                 console.log("no image is set");
             }
+            
+            // get web socket
+            response = await fetch(PROXY+SERVER_URL+"/sionline/negotiate?token="+TOKEN+"&negotiateVersion=1",{
+                credentials: "include",
+                "method": "POST"
+            });
+            var wss_data = await response.json();
+            console.log(wss_data);
+
+            WEBSOCKET_CONNECTION_ID = wss_data.connectionId;
+            WEBSOCKET_CONNECTION_TOKEN = wss_data.connectionToken;
+
+            WEBSOCKET = new WebSocket("wss"+SERVER_URL.slice(5)+"/sionline?token="+TOKEN+"&id="+WEBSOCKET_CONNECTION_TOKEN);
+
+            WEBSOCKET.addEventListener('open',function(event){
+                disable_waiting_menu();
+                enable_inspector_menu();
+                WEBSOCKET.send('{"protocol":"json","version":1}\x1E');
+                WEBSOCKET.send('{"type":1,"target":"GetUsers","arguments":[],"invocationId":"initial_get_users"}\x1E');
+                WEBSOCKET.send('{"arguments":[],"invocationId":"initial_get_AI","streamIds":[],"target":"GetComputerAccounts","type":1}\x1E');
+                WEBSOCKET.send('{"type":1,"target":"GetGamesSlice","arguments":[0],"invocationId":"request_games"}\x1E');
+            });
+
+            WEBSOCKET.addEventListener('message',async function(event){
+                var messages_raw = event.data.split("\x1E");
+                
+                // console.log("USERS: ",USERS.size);
+                // console.log("GAMES: ",GAMES.size);
+
+                try{
+                    for(let i = 0;i<messages_raw.length;i++){
+                        if(messages_raw[i] === ''){
+                            continue;
+                        }
+                        await SignalRMessageHandler(JSON.parse(messages_raw[i]));
+                    }
+                }catch(e){
+                    console.log("Error encountered");
+                    console.log(e);
+                    console.log(event.data);
+                }
+            });
 
         }
 
+        /**
+         * 
+         * @param {JSON} message 
+         */
+        async function SignalRMessageHandler(message){
+            if(message.type === 3){
+                // if response
+                if(message.invocationId === "initial_get_users"){
+                    for(var i=0;i<message.result.length;i++){
+                        USERS.set(message.result[i],true);
+                    }
+                    return;
+                }else if(message.invocationId === "initial_get_AI"){
+                    for(var i=0;i<message.result.length;i++){
+                        INITIAL_AIS.push(message.result[i]);
+                    }
+                    return;
+                }else if(message.invocationId === "request_games"){
+                    if(message.result.isLastSlice != true){
+                        WEBSOCKET.send('{"type":1,"target":"GetGamesSlice","arguments":['+(message.result.data[message.result.data.length-1].gameID+1)+'],"invocationId":"request_games"}\x1E');
+                    }
+                    for(var i=0;i<message.result.data.length;i++){
+                        var key = message.result.data[i].gameID;
+                        var game = GAMES.get(key);
+                        if(game != undefined){
+                            console.log("Already exists!");
+                            continue;
+                        }
+                        GAMES.set(key,message.result[i]);
+                    }
+                }
+            }else if(message.type === 1){
+                // if request
+                if(message.target == "Leaved"){
+                    USERS.delete(message.arguments[0]);
+                }else if(message.target === "Joined"){
+                    USERS.set(message.arguments[0],true);
+                }else if(message.target === "GameChanged"){
+                    GAMES.set(message.arguments[0].gameID,
+                                message.arguments[0]);
+                }else if(message.target === "GameDeleted"){
+                    GAMES.delete(message.arguments[0]);
+                }
+                else if(message.target === "GameCreated"){
+                    GAMES.set(message.arguments[0].gameID);
+                }
+            }
+        }
 
 }
 

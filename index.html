@@ -1,12 +1,13 @@
 <html>
     <head>
+        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"> -->
         <style>
             html, body {
                 width: 100%;
                 height: 100%;
                 margin: 0px;
                 border: 0;
-                overflow: hidden; /*  Disable scrollbars */
+                overflow: auto; /*  Disable scrollbars */
                 display: block;  /* No floating content on sides */
                 }
             .menu_buttons_group{ 
@@ -55,10 +56,50 @@
                 border-top: none;
             }
 
+
+
+            .column {
+                float: left;
+                width: 33.33%;
+                height: 100%;
+                float: left;
+            }
+
+            /* Clear floats after the columns */
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            .new_game_button{
+                background-color: rgb(12, 22, 163);
+                border-color: yellow;
+                font-size: large;
+                color:yellow;
+            }
+
+            .inspector{
+                z-index:2;
+                position:absolute;
+                width:100%;
+                height:100%;
+                overflow-x:auto;
+            }
+
+            @media screen and (max-width: 1000px) {
+            .column {
+                width: 100%;
+            }
+            }
+
+
         </style>
     
     <script src="scripts/sha1WASM_bg.js"></script>
     <script src="scripts/main.js"></script>
+    
+
 
     <!--Standart assets-->
     <img id="main_bg" widht="0" height="0" src="assets/main_background.jpg" style="display:none;">
@@ -99,6 +140,30 @@
                 
             </div>
         </div>
+
+        <!--Server inspector menu overflow: auto;-->
+        
+        <div id="inspector" class="inspector">
+            <div class="row">
+                <div id="lobbies" class="column">
+                    <div id="games_amount" style = "height:60px;font-size:45px;color:yellow;text-align: left;">Игры(0)</div>
+                    <input id="game_search" type="text" placeholder="Поиск игры" style="width:100%;font-size: large;height:60px;">
+                    <div id="lobbies_scroller" style="height:calc(100% - 180px);width:100%;font-size: large;overflow: auto;min-height: 60px;background-color: rgb(105, 153, 156);"></div>
+                    <button id="NewGame" style="height:60px;width:100%;" class="new_game_button" >НОВАЯ ИГРА</button>
+                </div>
+                <div id="lobby" class="column">
+                    <div style="height:60px"></div>
+                    <div id="lobby_info" style="width:100%;height:calc(100% - 60px);background-color: rgb(45, 86, 221);">Some text...</div>
+                </div>
+                <div id="chat_players" class="column">
+                    <div id="chat_player_header" style="height:60px"></div>
+
+                    <div id="chat" style="background-color: rgb(105, 153, 156);height:calc(100% - 60px);">Some text..</div>
+                    <div id="players" style="background-color: rgb(105, 153, 156);height:calc(100% - 60px);display: none;">Some text!!..</div>
+                </div>
+            </div>
+        </div>
+
 
     </body>
 
