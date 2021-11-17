@@ -115,7 +115,7 @@ function main() {
         disable_login_menu();
         disable_pfp_set_menu();
         disable_waiting_menu();
-        //disable_inspector_menu();
+        disable_inspector_menu();
 
         // registering events
         window.addEventListener('resize', resizeCanvas, false);
