@@ -87,12 +87,39 @@
                 overflow-x:auto;
             }
 
-            @media screen and (max-width: 1000px) {
+            @media screen and (max-width: 500px) {
             .column {
                 width: 100%;
             }
             }
+            
 
+            .lobby_scroller{
+                height:calc(100% - 180px);
+                width:100%;
+                font-size: large;
+                overflow: auto;
+                min-height: 60px;
+                background-color: rgb(105, 153, 156);
+            }
+
+            .lobby{
+                margin-top: 5px;
+                border-width:3px;
+                border-style:solid;
+                border-color: yellow;
+                height:40px;
+                text-align: left;
+                font-size:30px;
+                color:black;
+                position: relative;
+                overflow:hidden;
+            }
+            
+            .lobby:hover{
+                background-color: yellow;
+            }
+            
 
         </style>
     
@@ -148,18 +175,26 @@
                 <div id="lobbies" class="column">
                     <div id="games_amount" style = "height:60px;font-size:45px;color:yellow;text-align: left;">Игры(0)</div>
                     <input id="game_search" type="text" placeholder="Поиск игры" style="width:100%;font-size: large;height:60px;">
-                    <div id="lobbies_scroller" style="height:calc(100% - 180px);width:100%;font-size: large;overflow: auto;min-height: 60px;background-color: rgb(105, 153, 156);"></div>
+                    <div id="lobbies_scroller" class="lobby_scroller">
+                        <!-- <div class="lobby">
+                            <b>LOBBY NAME</b>
+                        </div>
+                        <div class="lobby">
+                            <b>LOBBY NAME</b>
+                        </div> -->
+                        
+                    </div>
                     <button id="NewGame" style="height:60px;width:100%;" class="new_game_button" >НОВАЯ ИГРА</button>
                 </div>
                 <div id="lobby" class="column">
                     <div style="height:60px"></div>
-                    <div id="lobby_info" style="width:100%;height:calc(100% - 60px);background-color: rgb(45, 86, 221);">Some text...</div>
+                    <div id="lobby_info" style="width:100%;height:calc(100% - 60px);background-color: rgb(45, 86, 221);overflow: auto;"></div>
                 </div>
                 <div id="chat_players" class="column">
                     <div id="chat_player_header" style="height:60px"></div>
 
-                    <div id="chat" style="background-color: rgb(105, 153, 156);height:calc(100% - 60px);">Some text..</div>
-                    <div id="players" style="background-color: rgb(105, 153, 156);height:calc(100% - 60px);display: none;">Some text!!..</div>
+                    <div id="chat" style="background-color: rgb(105, 153, 156);height:calc(100% - 60px);overflow: auto;"></div>
+                    <div id="players" style="background-color: rgb(105, 153, 156);height:calc(100% - 60px);display: none;overflow: auto;"></div>
                 </div>
             </div>
         </div>

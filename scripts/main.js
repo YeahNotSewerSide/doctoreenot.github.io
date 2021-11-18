@@ -76,7 +76,8 @@ function main() {
 
     // Inspector menu
     const INSPECTOR_MENU = document.getElementById("inspector");
-    
+    const GAMES_AMOUNT_PLACEHOLDER = document.getElementById("games_amount");
+    const LOBBIES_SCROLLER = document.getElementById("lobbies_scroller");
 
 
     var last_resize = 0;
@@ -511,6 +512,31 @@ function main() {
 
         }
 
+        function find_lobby_by_id(id){
+            return LOBBIES_SCROLLER.querySelector("[id='"+id+"']");
+        }
+        function add_lobby(name,id){
+            var lobby = document.createElement("div");
+            lobby.setAttribute("class","lobby");
+            lobby.setAttribute("id",""+id);
+            lobby.innerHTML = "<b>"+name+"</b>";
+            LOBBIES_SCROLLER.appendChild(lobby);
+        }
+        function remove_lobby(id){
+            //console.log("removing id",id);
+            var lobby = find_lobby_by_id(id);
+            //console.log(lobby);
+            try{
+                lobby.remove();
+            }catch{
+                return;
+            }
+        }
+        function set_amount_of_games(amount){
+            GAMES_AMOUNT_PLACEHOLDER.innerHTML = "Игры("+amount+")";
+        }
+
+
         /**
          * 
          * @param {JSON} message 
@@ -539,7 +565,9 @@ function main() {
                             console.log("Already exists!");
                             continue;
                         }
-                        GAMES.set(key,message.result[i]);
+                        add_lobby(message.result.data[i].gameName,key);
+                        GAMES.set(key,message.result.data[i]);
+                        set_amount_of_games(GAMES.size);
                     }
                 }
             }else if(message.type === 1){
@@ -551,11 +579,15 @@ function main() {
                 }else if(message.target === "GameChanged"){
                     GAMES.set(message.arguments[0].gameID,
                                 message.arguments[0]);
-                }else if(message.target === "GameDeleted"){
+                }else if(message.target === "GameDeleted"){                   
                     GAMES.delete(message.arguments[0]);
+                    set_amount_of_games(GAMES.size);
+                    remove_lobby(message.arguments[0]);
                 }
                 else if(message.target === "GameCreated"){
                     GAMES.set(message.arguments[0].gameID);
+                    set_amount_of_games(GAMES.size);
+                    add_lobby(message.arguments[0].gameName,message.arguments[0].gameID);
                 }
             }
         }
