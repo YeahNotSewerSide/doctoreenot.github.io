@@ -78,6 +78,18 @@ function main() {
     const INSPECTOR_MENU = document.getElementById("inspector");
     const GAMES_AMOUNT_PLACEHOLDER = document.getElementById("games_amount");
     const LOBBIES_SCROLLER = document.getElementById("lobbies_scroller");
+    const LOBBY_INFO_DISPLAY = document.getElementById("actualLobbyInfo");
+    
+    const LID_GAME_NAME = document.getElementById("GameName");
+    const LID_OWNER = document.getElementById("Owner");
+    const LID_PACK = document.getElementById("Pack");
+    const LID_RULES = document.getElementById("Rules");
+    const LID_CREATED = document.getElementById("Created");
+    const LID_BEGAN = document.getElementById("Began");
+    const LID_STATUS = document.getElementById("Status");
+    const LID_HOST = document.getElementById("Host");
+    const LID_PLAYERS = document.getElementById("Players");
+    const LID_VIEWERS = document.getElementById("Viewers");
 
 
     var last_resize = 0;
@@ -103,6 +115,7 @@ function main() {
     var USERS = new Map;
     var GAMES = new Map();
     var INITIAL_AIS = []
+    var LOBBY_DISCPLAYING_NOW = null;
 
 
     var stage = 0; // 0 - main menu
@@ -492,9 +505,6 @@ function main() {
 
             WEBSOCKET.addEventListener('message',async function(event){
                 var messages_raw = event.data.split("\x1E");
-                
-                // console.log("USERS: ",USERS.size);
-                // console.log("GAMES: ",GAMES.size);
 
                 try{
                     for(let i = 0;i<messages_raw.length;i++){
@@ -512,20 +522,112 @@ function main() {
 
         }
 
+        function get_string_from_timestamp(timestamp){
+            var splitted = timestamp.split("T");
+            var to_return = splitted[0];
+
+            to_return += " "+splitted[1].split('.')[0];
+            return to_return;
+        }
+
+        function LOBBY_CLICK(event){
+            LOBBY_INFO_DISPLAY.removeAttribute("style");
+            var id = parseInt(event.target.attributes.getNamedItem('id').value,10);
+            LOBBY_DISCPLAYING_NOW = id;
+            //console.log(GAMES.get(id));
+            var GAME = GAMES.get(id)
+
+            LID_GAME_NAME.innerText = GAME.gameName;
+            LID_OWNER.innerText = GAME.owner;
+            LID_PACK.innerText = GAME.packageName;
+
+            var rules_text = [];
+
+            if((GAME.rules&1)!=0){
+                rules_text += "1. С фальстартами";
+            }else{
+                rules_text += "1. Без фальстартов";
+            }
+            rules_text += "<br>";
+            if((GAME.rules&2)!=0){
+                rules_text += "2. Устная";
+            }else{
+                rules_text += "2. Текстовая";
+            }
+            rules_text += "<br>";
+            if((GAME.rules&4)!=0){
+                rules_text += "3. Без права на ошибку";
+            }else{
+                rules_text += "3. С правом на ошибку";
+            }
+
+            LID_RULES.innerHTML = rules_text;
+
+            LID_CREATED.innerText = get_string_from_timestamp(GAME.startTime);
+
+            if(GAME.started){
+                LID_BEGAN.innerText = get_string_from_timestamp(GAME.realStartTime);
+            }else{
+                LID_BEGAN.innerHTML = "Игра еще не началась";
+            }
+            
+            LID_STATUS.innerText = GAME.stageName;
+
+            LID_PLAYERS.innerHTML = "";
+            LID_VIEWERS.innerHTML = "";
+
+            var players_first = true;
+            var viewers_first = true;
+            for(let i=0;i<GAME.persons.length;i++){
+                let player = GAME.persons[i];
+                if(!player.isOnline){
+                    continue;
+                }
+                switch(player.role){
+                    case 2:
+                        LID_HOST.innerText = player.name; 
+                        break;
+                    case 1:
+                        if(players_first){
+                            LID_PLAYERS.innerText = player.name;
+                            players_first = false;
+                        }else{
+                            LID_PLAYERS.innerHTML += "<br>";
+                            LID_PLAYERS.innerText += player.name;
+                        }
+                        break;
+                    case 0:
+                        if(viewers_first){
+                            LID_VIEWERS.innerText = player.name;
+                            viewers_first = false;
+                        }else{
+                            LID_VIEWERS.innerHTML += "<br>";
+                            LID_VIEWERS.innerText += player.name;
+                        }
+                        break;
+                }
+            }
+        }
+
         function find_lobby_by_id(id){
             return LOBBIES_SCROLLER.querySelector("[id='"+id+"']");
         }
-        function add_lobby(name,id){
+        function add_lobby(name,id,has_password){
             var lobby = document.createElement("div");
             lobby.setAttribute("class","lobby");
             lobby.setAttribute("id",""+id);
-            lobby.innerHTML = "<b>"+name+"</b>";
+            lobby.addEventListener('click',LOBBY_CLICK,false);
+            if(has_password){
+                lobby.innerText = name;
+                lobby.innerHTML += '<img align="right" style="position: absolute;top: 0px;right:0px;" src="assets/lock.png">';
+            }
+            else{
+                lobby.innerText = name;
+            }
             LOBBIES_SCROLLER.appendChild(lobby);
         }
         function remove_lobby(id){
-            //console.log("removing id",id);
             var lobby = find_lobby_by_id(id);
-            //console.log(lobby);
             try{
                 lobby.remove();
             }catch{
@@ -536,6 +638,7 @@ function main() {
             GAMES_AMOUNT_PLACEHOLDER.innerHTML = "Игры("+amount+")";
         }
 
+        
 
         /**
          * 
@@ -565,7 +668,9 @@ function main() {
                             console.log("Already exists!");
                             continue;
                         }
-                        add_lobby(message.result.data[i].gameName,key);
+                        add_lobby(message.result.data[i].gameName,
+                                key,
+                                message.result.data[i].passwordRequired);
                         GAMES.set(key,message.result.data[i]);
                         set_amount_of_games(GAMES.size);
                     }
@@ -587,11 +692,34 @@ function main() {
                 else if(message.target === "GameCreated"){
                     GAMES.set(message.arguments[0].gameID);
                     set_amount_of_games(GAMES.size);
-                    add_lobby(message.arguments[0].gameName,message.arguments[0].gameID);
+                    add_lobby(message.arguments[0].gameName,
+                                message.arguments[0].gameID,
+                                message.arguments[0].passwordRequired);
                 }
             }
         }
 
 }
 
+// roles:
+// 1 - player
+// 2 - host
+// 0 - viewer
 
+// rules:
+// 3 - устная, с фальстартами
+// 2 - устная
+// 0 - без фальстартов
+// 1 - с фальстартами
+// 7 - устная, право на ошибку
+// MSB:
+// 2 bit: 1 - Право на ошибку
+// 1 bit: 1 - устная
+// 0 bit: 1 - с фальстартами
+
+
+// stages - 4
+
+// modes:
+// 1 - упрощенная
+// 0 - классическая

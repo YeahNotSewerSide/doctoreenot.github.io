@@ -28,6 +28,7 @@
                 border-top: none;
             }
             .menu_button:hover{
+                cursor: pointer;
                 background-color:rgb(50, 50, 241) ;
             }
 
@@ -113,12 +114,32 @@
                 color:black;
                 position: relative;
                 overflow:hidden;
+                font-weight: bold;
             }
             
             .lobby:hover{
+                cursor: pointer;
                 background-color: yellow;
             }
-            
+
+            .lobby_info{
+                width:100%;
+                height:calc(100% - 60px);
+                background-color: rgb(45, 86, 221);
+                overflow: auto;
+            }
+            .lobby_info_header{
+                margin-top: 5%;
+                font-size: 20px;
+                font-weight: bold;
+            }
+            .lobby_info_substring{
+                margin-left: 20px; 
+                font-size: 20px;
+            }
+            #actualLobbyInfo{
+                margin-left: 4px;
+            }
 
         </style>
     
@@ -129,7 +150,8 @@
 
     <!--Standart assets-->
     <img id="main_bg" widht="0" height="0" src="assets/main_background.jpg" style="display:none;">
-    
+
+
 </head>
 
     <body onload="main()">
@@ -175,19 +197,63 @@
                     <div id="games_amount" style = "height:60px;font-size:45px;color:yellow;text-align: left;">Игры(0)</div>
                     <input id="game_search" type="text" placeholder="Поиск игры" style="width:100%;font-size: large;height:60px;">
                     <div id="lobbies_scroller" class="lobby_scroller">
-                        <!-- <div class="lobby">
-                            <b>LOBBY NAME</b>
-                        </div>
-                        <div class="lobby">
-                            <b>LOBBY NAME</b>
-                        </div> -->
-                        
                     </div>
                     <button id="NewGame" style="height:60px;width:100%;" class="new_game_button" >НОВАЯ ИГРА</button>
                 </div>
                 <div id="lobby" class="column">
                     <div style="height:60px"></div>
-                    <div id="lobby_info" style="width:100%;height:calc(100% - 60px);background-color: rgb(45, 86, 221);overflow: auto;"></div>
+                    <div id="lobby_info" class="lobby_info">
+                        <div id="actualLobbyInfo" style="display: none;">
+                            <div id="GameName" class="lobby_info_header" style="font-size: 40px;">
+                                
+                            </div>
+
+                            <div class="lobby_info_header">Организатор:</div>
+                                <div id="Owner" class="lobby_info_substring">
+                                    
+                                </div>
+
+                            <div class="lobby_info_header">Пакет Вопросов:</div>
+                                <div id="Pack" class="lobby_info_substring">
+                                    
+                                </div>
+
+                            <div class="lobby_info_header">Правила:</div>
+                                <div id="Rules" class="lobby_info_substring">
+                                    
+                                </div>
+                            
+                            <div class="lobby_info_header">Создана:</div>
+                                <div id="Created" class="lobby_info_substring">
+                                    
+                                </div>
+
+                            <div class="lobby_info_header">Начата:</div>
+                                <div id="Began" class="lobby_info_substring">
+                                    
+                                </div>
+
+                            <div class="lobby_info_header">Статус:</div>
+                                <div id="Status" class="lobby_info_substring">
+                                    
+                                </div>
+
+                            <div class="lobby_info_header">Ведущий:</div>
+                                <div id="Host" class="lobby_info_substring">
+                                    
+                                </div>
+
+                            <div class="lobby_info_header">Игроки:</div>
+                                <div id="Players" class="lobby_info_substring">
+                                    
+                                </div>
+
+                            <div class="lobby_info_header">Зрители:</div>
+                                <div id="Viewers" class="lobby_info_substring">
+                                    
+                                </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="chat_players" class="column">
                     <div id="chat_player_header" style="height:60px"></div>
