@@ -79,7 +79,9 @@ function main() {
     const GAMES_AMOUNT_PLACEHOLDER = document.getElementById("games_amount");
     const LOBBIES_SCROLLER = document.getElementById("lobbies_scroller");
     const LOBBY_INFO_DISPLAY = document.getElementById("actualLobbyInfo");
-    
+    const INSPECTOR_CHAT = document.getElementById("chat");
+    const INSPECTOR_CHAT_ENTER = document.getElementById("chatInput");
+
     const LID_GAME_NAME = document.getElementById("GameName");
     const LID_OWNER = document.getElementById("Owner");
     const LID_PACK = document.getElementById("Pack");
@@ -115,7 +117,7 @@ function main() {
     var USERS = new Map;
     var GAMES = new Map();
     var INITIAL_AIS = []
-    var LOBBY_DISCPLAYING_NOW = null;
+    var LOBBY_DISPLAYING_NOW = null;
 
 
     var stage = 0; // 0 - main menu
@@ -138,6 +140,7 @@ function main() {
         LMB_SET_PFP.addEventListener('click',LMB_SET_PFP_CLICK,false);
         DND_BACK.addEventListener('click',DND_BACK_CLICK,false);
         LMB_LOGIN.addEventListener('click',LMB_LOGIN_CLICK,false);
+        INSPECTOR_CHAT_ENTER.addEventListener('keypress',INSPECTOR_CHAT_ON_PRESS);
 
         // Draw canvas border for the first time.
         resizeCanvas_wrapped();
@@ -530,10 +533,8 @@ function main() {
             return to_return;
         }
 
-        function LOBBY_CLICK(event){
-            LOBBY_INFO_DISPLAY.removeAttribute("style");
-            var id = parseInt(event.target.attributes.getNamedItem('id').value,10);
-            LOBBY_DISCPLAYING_NOW = id;
+        function change_display(id){
+            LOBBY_DISPLAYING_NOW = id;
             //console.log(GAMES.get(id));
             var GAME = GAMES.get(id)
 
@@ -556,9 +557,9 @@ function main() {
             }
             rules_text += "<br>";
             if((GAME.rules&4)!=0){
-                rules_text += "3. Без права на ошибку";
-            }else{
                 rules_text += "3. С правом на ошибку";
+            }else{
+                rules_text += "3. Без права на ошибку";
             }
 
             LID_RULES.innerHTML = rules_text;
@@ -609,6 +610,12 @@ function main() {
             }
         }
 
+        function LOBBY_CLICK(event){
+            LOBBY_INFO_DISPLAY.removeAttribute("style");
+            var id = parseInt(event.target.attributes.getNamedItem('id').value,10);
+            change_display(id);
+        }
+
         function find_lobby_by_id(id){
             return LOBBIES_SCROLLER.querySelector("[id='"+id+"']");
         }
@@ -638,7 +645,27 @@ function main() {
             GAMES_AMOUNT_PLACEHOLDER.innerHTML = "Игры("+amount+")";
         }
 
+        function add_message(user,message){
+            var message_block = document.createElement("div");
+            var username_block = document.createElement("b");
+
+            message_block.append(username_block);
+            username_block.innerText = user;
+            
+            message_block.append(": "+message);
+            INSPECTOR_CHAT.appendChild(message_block);
+        }
         
+        function INSPECTOR_CHAT_ON_PRESS(event){
+            const keyCode = event.which || event.keyCode;
+            if (keyCode === 13 && !event.shiftKey) {
+                event.preventDefault();
+                let message = INSPECTOR_CHAT_ENTER.value;
+                //console.log(INSPECTOR_CHAT_ENTER.value);
+                INSPECTOR_CHAT_ENTER.value = "";
+                WEBSOCKET.send('{"type":1,"target":"Say","arguments":["'+message+'"]}\x1E');
+            }
+        }
 
         /**
          * 
@@ -684,10 +711,17 @@ function main() {
                 }else if(message.target === "GameChanged"){
                     GAMES.set(message.arguments[0].gameID,
                                 message.arguments[0]);
+                    if(LOBBY_DISPLAYING_NOW === message.arguments[0].gameID){
+                        change_display(LOBBY_DISPLAYING_NOW);
+                    }
                 }else if(message.target === "GameDeleted"){                   
                     GAMES.delete(message.arguments[0]);
                     set_amount_of_games(GAMES.size);
                     remove_lobby(message.arguments[0]);
+                    if(LOBBY_DISPLAYING_NOW === message.arguments[0]){
+                        LOBBY_INFO_DISPLAY.setAttribute("style","display:none");
+                    }
+                    LOBBY_DISPLAYING_NOW = null;
                 }
                 else if(message.target === "GameCreated"){
                     GAMES.set(message.arguments[0].gameID);
@@ -695,6 +729,10 @@ function main() {
                     add_lobby(message.arguments[0].gameName,
                                 message.arguments[0].gameID,
                                 message.arguments[0].passwordRequired);
+                }
+                else if(message.target === "Say"){
+                    add_message(message.arguments[0],
+                                message.arguments[1]);
                 }
             }
         }
