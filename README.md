@@ -6,4 +6,6 @@ bad design, better communication with server, possibility to set avatars
 
 For now, only server inspector is implemented, even tho the game is fully reversed already.
 
+Test client is available under url https://doctoreenot.github.io
+
 
